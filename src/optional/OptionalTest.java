@@ -64,7 +64,7 @@ public class OptionalTest {
                 .orElse(0.0);
 
         /**
-         * podemos ainda jogar um Exception, além de vários outros metodos para fugir de null pointer ex
+         * podemos ainda jogar um Exception, além de vários outros metodos para fugir de null pointer,ex:
          */
 
         double media1 = usuarios
@@ -91,7 +91,7 @@ public class OptionalTest {
          */
 
         Optional<Usuario> max = usuarios.stream().max(Comparator.comparingInt(Usuario::getPontos));
-        //se a lista for vazia, não havera usupario para ser retornado. por isso o retorno é um Optional.
+        //se a lista for vazia, não havera usuario para ser retornado. por isso o retorno é um Optional.
 
 
         /**

@@ -5,6 +5,7 @@ import lambdas.Usuario;
 import java.util.*;
 import java.util.function.IntBinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class StreamTest {
@@ -168,7 +169,7 @@ public class StreamTest {
         List<Integer> pontos1 = usuarios.stream().map(Usuario::getPontos).toList();
 
         /**
-         * intStream, para evitar autoboxing
+         * intStream, para evitar autoboxing(operacoes desnecessárias)
          *
          * obetendo a média de pontos dos usuários!
          *
@@ -281,8 +282,152 @@ public class StreamTest {
         //pronto! temos um codigo equivalente ao metodo sum()
 
 
+        // forma mais sucinta, sem a declaracao de variáveis locais:
+
+        int total2 = usuarios.stream()
+                .mapToInt(Usuario::getPontos)
+                .reduce(0,(a,b) -> a + b);
+
+        // indo mais além, na classe Integer há um metodo estatico SUM:
+
+        int total3 = usuarios.stream()
+                .mapToInt(Usuario::getPontos)
+                .reduce(0,Integer::sum);
+
+        //obs:  há alguns casos especiais em que invocar o map pode ser custoso, e o melhor seria fazer a
+        //operacao de soma diretamente.
+        //soma sem o map :
+
+        int total4 = usuarios.stream()
+                .reduce(0,(atual, u) -> atual + u.getPontos(),Integer::sum);
+
+
+
+        /**
+         * obs: qual a vantagem de usar reduce em vez do sum ?
+         * nenhuma! o importante é conhece-lo para poder realizar operacoes que nao se encontram no stream
+         * por exemplo, multiplicar todos os pontos:
+         */
+
+        int multiplicacao = usuarios.stream()
+                .mapToInt(Usuario::getPontos)
+                .reduce(1,(a,b)-> (a * b));
+
+
+        /**
+         * trabalhando com ITERATORS
+         *
+         * vimos que podemos coletar o resultado de um pipeline de operacoes de um stream em uma colecao com o collect.
+         * algumas vezes nem precisamos de uma colecao: bastaria iterarmos pelos elementos de um stream
+         */
+
+        //nao conseguimos iterar da forma antiga:
+
+//        for (Usuario u : usuarios.stream()){
+//
+//        }
+
+        //ocorre um erro de compilacao. O for espera ou uma array ou um iterable!
+
+        //podemos invocar o metodo iterator.
+
+        //Iterator<Usuario> i = usuarios.stream().iterator();
+
+        //a interface iterator ja existe há bastante tempo no java e define os metodos : hasNext,next e remove!
+        // no java 8 podemos então percorrer um iterator utilizando o metodo "forEachRemaining" que recebe um Consumer.
+
+        usuarios.stream().iterator().forEachRemaining(System.out::println);
+
+        /**
+         * obs: mas quando devcemos usar um iterator de um stream se há um forEach tanto em Collection quando no proprio
+         * Stream ?
+         *
+         * Um motivo para usar um iterator é quando queremos modificar os objetos de um stream. Quando utlizarmos streams
+         * paralelos, veremos que nao devemos mudar o estado dos objetos que estão nele, correndo o risco de ter
+         * resultados nao deterministicos.
+         *
+         * outro motivo é a compatibilidade de APIs. pode ser que voce precise invocar um metodo que recebe Iterator.
+         */
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /**
+         * testando PREDICATES
+         * Vimos bastante o uso do filter. Ele recebe uma lambda como argumento, que é a interface Pedicate. Há outras
+         * situações em que queremos testar predicados, mas não precisamos da lista filtrada. Por exemplo, se
+         * quisermos saber se há algum elemento daquela lista que é moderador:
+         */
+
+        boolean hasModerator = usuarios.stream()
+                .anyMatch(Usuario::isModerador);
+        //aki, o "anyMatch" tem o mesmo efeito que : u -> u.isModerador(), gerando um predicado que testa se um
+        //usuário é moderador e devolve um booleano. O processamento dessa operacao para assim que o stream encontrar
+        // algum usuario moderador.
+
+        /**
+         * obs: assim como o "anyMatch", podemos descobrir se todos os usuários são moderadores com "allMacth" ou se
+         * nenhum deles é, com o "noneMacth".
+         */
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * Há vários outros métodos! Exemplo : count,skip e limit
+         */
+
+        //consegue saber quantos elemos há no stream! idem ao size de collection
+        long count = usuarios.stream().count();
+
+        //pula os N próximos elementos do stream
+        Stream<Usuario> skip = usuarios.stream().skip(0);
+
+        //é possivel ter o limite de N elementos no stream, semelhante a um filtro
+        //neste exemplo aki, no stream de 9 users, será mostrado apenas 1.
+        Stream<Usuario> limit = usuarios.stream().limit(1);
+
+        /**
+         * é possivel criar um stream sem a necessidade de uma coleção, devido ao metodo estatico "of":
+         */
+
+        Stream<Usuario> concat = Stream.of(user1, user2, user3, user4);
+
+
+       // é possivel criar um stream vazio:
+        Stream<Object> empty = Stream.empty();
+
+        // metodos de factory como o range
+        IntStream range = IntStream.range(1,1000);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * é possivel criar streams infinitos:
+         */
+
+        Random randomNumbers = new Random(0);
+
+        IntStream stream3 = IntStream.generate(randomNumbers::nextInt);
+
+        /**
+         * obs: voce utilizar apenas operacoes de "curto-circuito em Streams infinitos.
+         * int valor = stream3.sum nao pararia de executar.
+         */
+
+        /**
+         * operacoes curto-circuito: sao operacoes que nao precisam processar todos os elementos do stream
+         * um exemplo, seria pegar apenas os 100 primeiros elementos:
+         */
+
+        List<Integer> list100 = stream3
+                .limit(100)
+                .boxed().toList();
+
+
+
 
 
     }
+
 
 }

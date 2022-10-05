@@ -1,6 +1,7 @@
 package lambdas;
 
 
+
 public class Usuario {
 
     private String nome;
@@ -22,7 +23,6 @@ public class Usuario {
     }
 
 
-
     public String getNome() {
         return nome;
     }
@@ -35,7 +35,7 @@ public class Usuario {
         return moderador;
     }
 
-    public void tornaModerador(){
+    public void tornaModerador() {
         this.moderador = true;
     }
 
@@ -48,8 +48,11 @@ public class Usuario {
                 '}';
     }
 
-    public void atualiza(double value){
+    public void atualiza(double value) {
 
     }
+
+
+
 }
 
