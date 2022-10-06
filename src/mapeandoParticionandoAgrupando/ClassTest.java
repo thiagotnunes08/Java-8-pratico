@@ -177,7 +177,25 @@ public class ClassTest {
         long fim = System.currentTimeMillis();
 
 
-        System.out.println(fim - coemco);
+       // System.out.println(fim - coemco);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * operacoes nao deterministicas e ordered streams.
+         *
+         * operacoes nao deterministicas podem devolver diferentes resultados quando utilizadas em streams paralelos.
+         * Os principais exemplos sao o forEach e o findAny. Ao invoca-los vc nao tem garantia da ordem de execucao,
+         * isso melhora a performace em paralelo. (caso necessite garantir a ordem utilize forEachOrdered e o findFirst.
+         */
+
+
+        /**
+         * para saber mais: a base do stream paralelo é o Spliterator. ele é como um iterator, so que muitas vezes pode
+         * ser facilmente quebrado em spliterator menores, para que cada thread disponivel consuma um pedaco do
+         * seu stream. A interface iterable agoraa também define um metodo default spliterator(). Tudo que vimos
+         * de paralelizacao sao abstracoes que utilizam Slpiterators por debaixo dos panos, junto com a API de Fork/Join.
+         */
 
 
 
