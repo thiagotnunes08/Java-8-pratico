@@ -1,6 +1,7 @@
 package novaApiDatas;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Calendar;
 import java.util.Locale;
@@ -163,6 +164,44 @@ public class TestDatas {
         System.out.println(DayOfWeek.FRIDAY.getDisplayName(TextStyle.SHORT_STANDALONE,Locale.forLanguageTag("pt-br")));
 
 
+        /**
+         * formatando as novas datas.
+         * formatar um localdatetime, por exemplo ficou mt simples. É so chamar o metodo format passando DateTimeFormatter
+         * como parametro
+         */
+
+        LocalDateTime now = LocalDateTime.now();
+                                                            //há vários outros formatos a serem explorados
+        String resultOfFormat = now.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+        /**
+         * pode tmb criar um novo padrao, utilizando o ofPattern:
+         */
+
+        LocalDateTime agora1 = LocalDateTime.now();
+        String format = agora1.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+
+        //podemos ir além e transformar essa string em alguma representacao de data valida, e para isso usamos o
+        // metodo "parse"
+
+
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        String resultado = agora1.format(formatador);
+
+        LocalDate agrEmData = LocalDate.parse(resultado,formatador);
+
+        /**
+         * obs: oberserve que fizemos o parse desse resultado em um LocalDate, e nao em um LocalDateTime, que é o
+         * tipo da tada inicial pois perdemos as informacoes de tempo (horas,minutos,segundos e nano segundos)
+         */
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /**
+         * duração e período
+         */
 
 
     }
