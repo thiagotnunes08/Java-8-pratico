@@ -1,8 +1,10 @@
 package novaApiDatas;
 
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -200,8 +202,91 @@ public class TestDatas {
 
 
         /**
-         * duração e período
+         * duração e período.
+         *
+         * Sempre foi problematico trabalhar com diferenca de alguma medida de tempo em java. Exemplo: calcular
+         * a diferenca de dias entre dois Calendars.
          */
+
+        Calendar agr = Calendar.getInstance();
+
+        Calendar outraData = Calendar.getInstance();
+        outraData.set(1999,Calendar.APRIL,26);
+
+        long diferenca = agr.getTimeInMillis() - outraData.getTimeInMillis();
+
+        long milissegundoEmUmDia = 1000 * 60 * 60 * 24;
+
+        long dia = diferenca / milissegundoEmUmDia;
+
+        // agora podemos fazer essa mesma operacao de forma muito mais simples utilizando o enum ChronoUnit da nova api
+
+        LocalDate agoran = LocalDate.now();
+
+        LocalDate outraDatan = LocalDate.of(1999,Month.APRIL,26);
+
+        long diass = ChronoUnit.DAYS.between(outraDatan,agoran);
+
+        //podemos tmb saber a diferenca de anos e meses
+
+        long meses = ChronoUnit.MONTHS.between(outraDatan,agoran);
+
+        long anos = ChronoUnit.YEARS.between(outraDatan,agoran);
+
+        System.out.println("dias:" + diass + " meses: " + meses + " anos:" + anos);
+        //saida = dias:8572 meses:281 anos:23
+
+        ////////////////////////////////////////////////////////////////////////////////
+
+        // uma forma de conseguir o resultado que esperamos: os dias, meses e anos entre duas datas utilizando o modelo
+        //"Period"
+
+        LocalDate aagora = LocalDate.now();
+        LocalDate outraDataa = LocalDate.of(1999,Month.APRIL,26);
+        Period periodo = Period.between(outraDataa,aagora);
+
+        System.out.println("dias: " + periodo.getDays() + " meses:"+ periodo.getMonths() + " anos:" + periodo.getYears());
+        //SAIDA: dias: 18 meses:5 anos:23
+
+        //há metodos auxiliarea com o isNegative para lidarmos com datas negativas(é comum gerar valores negativos dependento da ordem dos argumentos recebidos no between)
+        if (periodo.isNegative()){
+            //aki negamos seu valores e com isso a data fica positiva
+            periodo = periodo.negated();
+        }
+
+        /////////////////////////////////////////////////////////////////////////////
+
+        //existem diversas outras formas de se criar um period, além do metodo between uma delas é of
+        Period period = Period.of(1999, 4, 26);
+        //também podemos criar periodos de dias,meses ou anos utilizando o ofDays,ofMonths e ofYears
+
+        ///////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * mas como criar um periodo de horas,minutos ou segundo ?
+         * com period não é posivel, pois é considerado dias,meses e anos. Neste caso utilizamos a classe Duration que
+         * considera horas, minutos e segundos
+         */
+
+        LocalDateTime noww = LocalDateTime.now();
+        LocalDateTime daquiUmaHora = LocalDateTime.now().plusHours(1);
+
+        Duration duracao = Duration.between(daquiUmaHora,noww);
+
+        System.out.println(duracao);
+
+        if (duracao.isNegative()){
+            duracao = duracao.negated();
+        }
+
+
+        //obs: repare que como estamos trabalhando com tempo, utilizamos o localDateTime
+
+
+
+
+
+
 
 
     }
