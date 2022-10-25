@@ -2,12 +2,10 @@ package pratica;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -115,6 +113,139 @@ public class Tests {
                 .max(Map.Entry.comparingByValue())
                 .ifPresent(System.out::println);
         //o max devolve um optional, por isso o ifPresent
+
+        /**
+         * valores gerados por produtos
+         */
+
+        Map<Produto,BigDecimal> valorTotalPorProduto = pagamentos.stream()
+                .flatMap(p -> p.getProdutos().stream())
+                .collect(Collectors.groupingBy(Function.identity(),
+                        Collectors.reducing(BigDecimal.ZERO,Produto::getPrice,BigDecimal::add)));
+
+        valorTotalPorProduto.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue()).forEach(System.out::println);
+
+        //podemos fazer de outra forma esse agrupamento:
+
+        Map<Produto,BigDecimal> totalValorPorProduto2 = pagamentos.stream()
+                .flatMap(p-> p.getProdutos().stream())
+                .collect(Collectors.toMap(Function.identity(),
+                        Produto::getPrice,
+                        BigDecimal::add));
+
+        //nesse caso, estamos dizendo ao coletor para invocar o metodo add usando o valor antigo como referencia
+        //e passando o valor novo como argumento, armazenando seu retorno.
+
+        /**
+         * quais sao os produtos de cada cliente?
+         * em um primeiro momento, podemos ter, para cada Cliente, sua Lista de pagamentos,bastando agrupar
+         * os pagamnetos com groupingBy(Pagamentos::getClientes):
+         */
+
+        Map<Cliente,List<Pagamento>> clientesParaPagamentos =
+                pagamentos.stream()
+                        .collect(Collectors.groupingBy(Pagamento::getCliente));
+        //mas nao estamos interessados nos pagamentos de um cliente. E sim nas listas de produtos!
+        //fazemos:
+
+        Map<Cliente,List<List<Produto>>> clientesParaListProdutos =
+                pagamentos.stream().collect(Collectors.groupingBy(Pagamento::getCliente,Collectors.mapping(Pagamento::getProdutos,Collectors.toList())));
+
+        clientesParaListProdutos.entrySet().stream()
+                .sorted(Comparator.comparing(e-> e.getKey().getNome()))
+                .forEach(System.out::println);
+
+        //a saída : Cliente{nome='andressa'}=[[Produto{nome='Celular', price=2000}, Produto{nome='Geladeira', price=1500}, Produto{nome='TV', price=1000}]] (lista aninhadas)
+
+        //queremos esse mesmo resultado mas com as listas achatadas em uma só.
+
+        Map<Cliente,List<Produto>> clientesParaProdutosPasso2 =
+                clientesParaListProdutos.entrySet().stream()
+                        .collect(Collectors
+                                .toMap(Map.Entry::getKey,e-> e.getValue()
+                                .stream().flatMap(List::stream)
+                                .collect(Collectors.toList())));
+
+        clientesParaProdutosPasso2.entrySet()
+                .stream()
+                .sorted(Comparator.comparing(e-> e.getKey().getNome())).forEach(System.out::println);
+
+        //é possivel fazer tudo em uma unica chamada, porem estouraria as linhas de legibiliade!
+
+        Map<Cliente,List<Produto>> clientesParaProdutos1Passo =
+                pagamentos.stream()
+                        .collect(Collectors.groupingBy(Pagamento::getCliente,
+                                Collectors.mapping(
+                                        Pagamento::getProdutos,Collectors.toList()
+                                ))).entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey,
+                                e-> e.getValue().stream()
+                                        .flatMap(List::stream)
+                                        .collect(Collectors.toList())));
+        //dificil seguir esta sequencia. é mais facil quebrar em varios passos.
+
+
+        //outra solucao:
+
+        Map<Cliente,List<Produto>> clientesToProdutos =
+                pagamentos.stream()
+                        .collect(Collectors.groupingBy(Pagamento::getCliente,
+                                Collectors.reducing(Collections.emptyList(),
+                                        Pagamento::getProdutos,
+                                        (l1,l2)-> {List<Produto> list =
+                                new ArrayList<>();
+                                list.addAll(l1);
+                                list.addAll(l2);
+                                return list;})));
+
+        //tivemos que escrever algo muito parecido com o toList.Criamos um coletor que pega todos os produtos do pagamento
+        //e vai acumulando o resultado em uma nova Array list. o resultado é exatamente o mesmo que o flatMap
+
+        /**
+         * e qual é o nosso cliente mais especial ?
+         */
+
+        //começaremos com bigDecimal.ZERO e, para cada pagamento, faremos Bigdecima:add da soma dos precos de seus
+        //produtos. por esse motivo, uma reducao ainda aparece dentro do reducing
+
+
+        Map<Cliente, BigDecimal> totalValuePerCustomer = pagamentos.stream()
+                .collect(Collectors.groupingBy(Pagamento::getCliente,
+                        Collectors.reducing(BigDecimal.ZERO,
+                                p -> p.getProdutos().stream().map(Produto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add),
+                                BigDecimal::add)));
+
+        //o codigo está no minimo muito acumulado. Cremos ja termos passado do limite da legibilidade, Vamos quebrar
+        //essa reducao criando uma varival temporaria resposanvel por mapear um pagamento para a soma de todos
+        //os precos de seus produtos
+
+        Function<Pagamento,BigDecimal> pagamentoTotal =
+                pagamento -> pagamento.getProdutos()
+                        .stream()
+                        .map(Produto::getPrice)
+                        .reduce(BigDecimal.ZERO,BigDecimal::add);
+
+        //com isso podemos utilizar essa function no reducing:
+
+        Map<Cliente,BigDecimal> totalPorClient =
+                pagamentos.stream()
+                        .collect(Collectors.groupingBy(Pagamento::getCliente,
+                                Collectors.reducing(BigDecimal.ZERO,pagamentoTotal,BigDecimal::add)));
+
+        //conteudo do mapa:
+        //.sorted(Comparator.comparing(Map.Entry::getValue)) - forma antiga
+        totalPorClient.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEach(System.out::println);
+
+
+
+
+
+
+
 
 
 
