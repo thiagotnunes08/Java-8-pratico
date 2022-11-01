@@ -97,7 +97,7 @@ public class TestMethod {
 
     /**
      * quando há argumentos da classe no construtor, que receba o que será criado (Usuario)
-     * como qual arhumento vai ser passado para o contrutor (String) = utilizamos Function!!
+     * como qual argumento vai ser passado para o contrutor (String) = utilizamos Function!!
      */
 
     Function<String,Usuario> criandoUser1 = Usuario::new;

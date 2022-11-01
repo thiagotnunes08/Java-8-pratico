@@ -1,6 +1,5 @@
 package novaApiDatas;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -279,14 +278,7 @@ public class TestDatas {
             duracao = duracao.negated();
         }
 
-
         //obs: repare que como estamos trabalhando com tempo, utilizamos o localDateTime
-
-
-
-
-
-
 
 
     }

@@ -19,7 +19,7 @@ public class ClassTest {
 
 
         Usuario user1 = new Usuario("thiago", 6, true);
-        Usuario user2 = new Usuario("ana", 7, false);
+        Usuario user2 = new Usuario("ana", 8, false);
         Usuario user3 = new Usuario("bruna", 8, true);
         Usuario user7 = new Usuario("junior", 4, false);
         Usuario user8 = new Usuario("hayssa", 111, true);
@@ -81,7 +81,9 @@ public class ClassTest {
                 usuarios.stream()
                         .collect(Collectors.groupingBy(Usuario::getPontos));
 
-      //  System.out.println(pontuacao2);
+        //pontuacao2.entrySet().forEach(System.out::println);
+
+     //   System.out.println(pontuacao2);
 
         /**
          * podemos ir além e particionar os usuários moderadoes e nao moderadores!
@@ -93,7 +95,8 @@ public class ClassTest {
                 .stream()
                 .collect(Collectors.partitioningBy(Usuario::isModerador));
 
-     //   System.out.println(moderadores);
+     //   moderadores.entrySet().forEach(System.out::println);
+
 
         /**
          * ao ives de guardar o objeto usuario e todas suas informacoes, podemos pegar apenas o nome!
@@ -106,7 +109,7 @@ public class ClassTest {
                         Usuario::isModerador,Collectors.mapping(Usuario::getNome,Collectors.toList()
                         )));
 
-        //System.out.println(nomeModeradores);
+        //nomeModeradores.entrySet().forEach(System.out::println);
 
         /**
          * vamo a mais um desafio: particionar por quem é moderador,mas ter como valor nao os usuários, mas sim a soma
@@ -120,7 +123,7 @@ public class ClassTest {
                                 Collectors
                                         .summingInt(Usuario::getPontos)));
 
-      //  System.out.println(pontuacaoPorModeradores);
+     // pontuacaoPorModeradores.entrySet().forEach(System.out::println);
 
         /**
          * é possivel também concatenar todos os nomes dos usuários com um coletor!
@@ -129,9 +132,9 @@ public class ClassTest {
         String nomes = usuarios
                 .stream()
                 .map(Usuario::getNome)
-                .collect(Collectors.joining("|"));
+                .collect(Collectors.joining(","));
 
-        //System.out.println(nomes);
+        System.out.println(nomes);
 
         /**
          * obs: com streams e coletores, conseguimos os mesmos resultados de antigamente, porém em um estilo funcional e,

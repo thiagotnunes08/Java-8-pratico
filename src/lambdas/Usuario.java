@@ -1,6 +1,7 @@
 package lambdas;
 
 
+import java.util.ArrayList;
 
 public class Usuario {
 
@@ -58,7 +59,12 @@ public class Usuario {
 
     }
 
+    public void adiciona(){
+
+    }
 
 
+    public <E> void adiciona(ArrayList<E> es) {
+    }
 }
 
